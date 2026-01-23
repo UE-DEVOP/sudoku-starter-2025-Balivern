@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sudoku_api/sudoku_api.dart';
 
 class Game extends StatefulWidget {
   const Game({Key? key, required this.title}) : super(key: key);
@@ -11,11 +12,15 @@ class Game extends StatefulWidget {
 
 class _GameState extends State<Game> {
   int _counter = 0;
+  late PuzzleOptions puzzleOptions;
+  late Puzzle puzzle;
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  @override
+  void initState() {
+    super.initState();
+    puzzleOptions = PuzzleOptions(patternName: "winter");
+    puzzle = Puzzle(puzzleOptions);
+    puzzle.generate();
   }
 
   @override
@@ -24,7 +29,7 @@ class _GameState extends State<Game> {
     var width = MediaQuery.of(context).size.width;
     var maxSize = height > width ? width : height;
     var boxSize = (maxSize / 3).ceil().toDouble();
-
+    
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -33,14 +38,6 @@ class _GameState extends State<Game> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            SizedBox(height: boxSize),
             SizedBox(
               width: boxSize * 3,
               height: boxSize * 3,
@@ -56,11 +53,18 @@ class _GameState extends State<Game> {
                     child: GridView.count(
                       crossAxisCount: 3,
                       children: List.generate(9, (y) {
+                        var value = puzzle.board()?.matrix()?[x][y].getValue();
                         return Container(
                           width: boxSize / 3,
                           height: boxSize / 3,
                           decoration: BoxDecoration(
                             border: Border.all(width: 0.3, color: Colors.black),
+                          ),
+                          child: Center(
+                            child: Text(
+                              value != 0 ? value.toString() : '',
+                              style: const TextStyle(fontSize: 20),
+                            ),
                           ),
                         );
                       }),
@@ -68,15 +72,9 @@ class _GameState extends State<Game> {
                   );
                 }),
               ),
-            ),
-          ],
+      )],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
