@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const Game(title: 'Flutter Demo Home Page'),
+      home: const Game(title: 'Sudoku FlutterGames'),
     );
   }
 }
