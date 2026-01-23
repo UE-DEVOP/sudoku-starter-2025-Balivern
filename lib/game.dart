@@ -21,6 +21,7 @@ class _GameState extends State<Game> {
     puzzleOptions = PuzzleOptions(patternName: "winter");
     puzzle = Puzzle(puzzleOptions);
     puzzle.generate();
+    puzzle.solvedBoard();
   }
 
   @override
@@ -54,7 +55,8 @@ class _GameState extends State<Game> {
                       crossAxisCount: 3,
                       children: List.generate(9, (y) {
                         var value = puzzle.board()?.matrix()?[x][y].getValue();
-                        return Container(
+                        var solutionValue = puzzle.solvedBoard()?.matrix()?[x][y].getValue();
+                        return value != 0 ? Container(
                           width: boxSize / 3,
                           height: boxSize / 3,
                           decoration: BoxDecoration(
@@ -62,8 +64,21 @@ class _GameState extends State<Game> {
                           ),
                           child: Center(
                             child: Text(
-                              value != 0 ? value.toString() : '',
-                              style: const TextStyle(fontSize: 20),
+                              value.toString(),
+                              style: const TextStyle(fontSize: 20, color: Colors.black),
+                            ),
+                          ),
+                        ) : InkWell(
+                          onTap: () {
+                            setState(() {
+                              puzzle.board()?.matrix()?[x][y].setValue(1);
+                            });
+                          },
+                          child: Container(
+                            width: boxSize / 3,
+                            height: boxSize / 3,
+                            decoration: BoxDecoration(
+                              border: Border.all(width: 0.3, color: Colors.black),
                             ),
                           ),
                         );
