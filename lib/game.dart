@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sudoku_api/sudoku_api.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
 class Game extends StatefulWidget {
   const Game({Key? key, required this.title}) : super(key: key);
@@ -11,7 +12,6 @@ class Game extends StatefulWidget {
 }
 
 class _GameState extends State<Game> {
-  int _counter = 0;
   late PuzzleOptions puzzleOptions;
   late Puzzle puzzle;
 
@@ -47,6 +47,37 @@ class _GameState extends State<Game> {
     return selectedBlockIndex == blockIndex && selectedCellIndex == cellIndex;
   }
 
+  // Méthode pour insérer une valeur avec validation
+  void insertValue(int value) {
+    if (selectedBlockIndex == null || selectedCellIndex == null) return;
+
+    var solutionValue = puzzle.solvedBoard()?.matrix()?[selectedBlockIndex!][selectedCellIndex!].getValue();
+
+    if (solutionValue != null && value == solutionValue) {
+      // Valeur correcte : on l'insère
+      setState(() {
+        puzzle.board()?.matrix()?[selectedBlockIndex!][selectedCellIndex!].setValue(value);
+        selectedBlockIndex = null;
+        selectedCellIndex = null;
+      });
+    } else {
+      // Valeur incorrecte : afficher le SnackBar et ne pas insérer
+      final snackBar = SnackBar(
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        duration: const Duration(seconds: 3),
+        content: AwesomeSnackbarContent(
+          title: 'Raté!',
+          message: 'La valeur $value ne correspond pas à la solution attendue.',
+          contentType: ContentType.warning,
+        ),
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height / 2;
@@ -62,6 +93,7 @@ class _GameState extends State<Game> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            // ----------------------- GRILLE DE SUDOKU -----------------------
             SizedBox(
               width: boxSize * 3,
               height: boxSize * 3,
@@ -121,6 +153,7 @@ class _GameState extends State<Game> {
                 }),
               ),
             ),
+            // ----------------------- GRILLE DE BOUTONS -----------------------
             const SizedBox(height: 20),
             Column(
               children: [
@@ -133,16 +166,7 @@ class _GameState extends State<Game> {
                         onPressed: (selectedBlockIndex != null &&
                                 selectedCellIndex != null)
                             ? () {
-                                setState(() {
-                                  puzzle
-                                      .board()
-                                      ?.matrix()?[selectedBlockIndex!]
-                                          [selectedCellIndex!]
-                                      .setValue(index + 1);
-                                  // Désélectionner la case après l'insertion
-                                  selectedBlockIndex = null;
-                                  selectedCellIndex = null;
-                                });
+                                insertValue(index + 1);
                               }
                             : null,
                         style: ButtonStyle(
@@ -167,16 +191,7 @@ class _GameState extends State<Game> {
                         onPressed: (selectedBlockIndex != null &&
                                 selectedCellIndex != null)
                             ? () {
-                                setState(() {
-                                  puzzle
-                                      .board()
-                                      ?.matrix()?[selectedBlockIndex!]
-                                          [selectedCellIndex!]
-                                      .setValue(number);
-                                  // Désélectionner la case après l'insertion
-                                  selectedBlockIndex = null;
-                                  selectedCellIndex = null;
-                                });
+                                insertValue(number);
                               }
                             : null,
                         style: ButtonStyle(
