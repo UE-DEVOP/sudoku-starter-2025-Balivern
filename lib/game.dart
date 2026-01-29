@@ -14,6 +14,10 @@ class _GameState extends State<Game> {
   int _counter = 0;
   late PuzzleOptions puzzleOptions;
   late Puzzle puzzle;
+  
+  // Variables pour la sélection de case
+  int? selectedBlockIndex;  // Index du bloc 3x3 sélectionné
+  int? selectedCellIndex;   // Index de la cellule dans le bloc
 
   @override
   void initState() {
@@ -22,6 +26,25 @@ class _GameState extends State<Game> {
     puzzle = Puzzle(puzzleOptions);
     puzzle.generate();
     puzzle.solvedBoard();
+  }
+
+  // Méthode pour sélectionner une case
+  void selectCell(int blockIndex, int cellIndex) {
+    setState(() {
+      // Si on clique sur la même case, on la désélectionne
+      if (selectedBlockIndex == blockIndex && selectedCellIndex == cellIndex) {
+        selectedBlockIndex = null;
+        selectedCellIndex = null;
+      } else {
+        selectedBlockIndex = blockIndex;
+        selectedCellIndex = cellIndex;
+      }
+    });
+  }
+
+  // Vérifie si une case est sélectionnée
+  bool isCellSelected(int blockIndex, int cellIndex) {
+    return selectedBlockIndex == blockIndex && selectedCellIndex == cellIndex;
   }
 
   @override
@@ -56,29 +79,33 @@ class _GameState extends State<Game> {
                       children: List.generate(9, (y) {
                         var value = puzzle.board()?.matrix()?[x][y].getValue();
                         var solutionValue = puzzle.solvedBoard()?.matrix()?[x][y].getValue();
-                        return value != 0 ? Container(
-                          width: boxSize / 3,
-                          height: boxSize / 3,
-                          decoration: BoxDecoration(
-                            border: Border.all(width: 0.3, color: Colors.black),
-                          ),
-                          child: Center(
-                            child: Text(
-                              value.toString(),
-                              style: const TextStyle(fontSize: 20, color: Colors.black),
-                            ),
-                          ),
-                        ) : InkWell(
-                          onTap: () {
-                            setState(() {
-                              puzzle.board()?.matrix()?[x][y].setValue(1);
-                            });
+                        bool isSelected = isCellSelected(x, y);
+                        bool hasValue = value != null && value != 0;
+                        
+                        return InkWell(
+                          onTap: hasValue ? null : () {
+                            selectCell(x, y);
                           },
                           child: Container(
                             width: boxSize / 3,
                             height: boxSize / 3,
                             decoration: BoxDecoration(
                               border: Border.all(width: 0.3, color: Colors.black),
+                              color: isSelected 
+                                ? Colors.blue.withValues(alpha: 0.3)
+                                : Colors.transparent,
+                            ),
+                            child: Center(
+                              child: Text(
+                                value != null && value != 0 
+                                ? value.toString() 
+                                : '',
+                                style: TextStyle(
+                                  fontSize: 20, 
+                                  fontWeight: FontWeight.bold,
+                                  color: value != null && value != 0 ? Colors.black : Colors.grey,
+                                ),
+                              ),
                             ),
                           ),
                         );
