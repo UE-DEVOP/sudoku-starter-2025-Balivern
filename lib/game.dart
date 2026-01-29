@@ -103,13 +103,13 @@ class _GameState extends State<Game> {
                               child: Text(
                                 value != null && value != 0
                                     ? value.toString()
-                                    : '',
+                                    : (solutionValue != null ? solutionValue.toString() : ''),
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                   color: value != null && value != 0
                                       ? Colors.black
-                                      : Colors.grey,
+                                      : Colors.black12,
                                 ),
                               ),
                             ),
@@ -121,35 +121,77 @@ class _GameState extends State<Game> {
                 }),
               ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(9, (index) {
-                return Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: ElevatedButton(
-                    onPressed: (selectedBlockIndex != null &&
-                            selectedCellIndex != null)
-                        ? () {
-                            setState(() {
-                              puzzle
-                                  .board()
-                                  ?.matrix()?[selectedBlockIndex!]
-                                      [selectedCellIndex!]
-                                  .setValue(index + 1);
-                              // Désélectionner la case après l'insertion
-                              selectedBlockIndex = null;
-                              selectedCellIndex = null;
-                            });
-                          }
-                        : null,
-                    style: ButtonStyle(backgroundColor: WidgetStateProperty.all<Color>(const Color.fromARGB(255, 28, 84, 167))),
-                    child: Text(
-                      (index + 1).toString(),
-                      style: const TextStyle(fontSize: 20, color: Colors.white),
-                    ),
-                  ),
-                );
-              }),
+            const SizedBox(height: 20),
+            Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(5, (index) {
+                    return Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: ElevatedButton(
+                        onPressed: (selectedBlockIndex != null &&
+                                selectedCellIndex != null)
+                            ? () {
+                                setState(() {
+                                  puzzle
+                                      .board()
+                                      ?.matrix()?[selectedBlockIndex!]
+                                          [selectedCellIndex!]
+                                      .setValue(index + 1);
+                                  // Désélectionner la case après l'insertion
+                                  selectedBlockIndex = null;
+                                  selectedCellIndex = null;
+                                });
+                              }
+                            : null,
+                        style: ButtonStyle(
+                            backgroundColor: WidgetStateProperty.all<Color>(
+                                const Color.fromARGB(255, 28, 84, 167))),
+                        child: Text(
+                          (index + 1).toString(),
+                          style: const TextStyle(
+                              fontSize: 20, color: Colors.white),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(4, (index) {
+                    int number = index + 6;
+                    return Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: ElevatedButton(
+                        onPressed: (selectedBlockIndex != null &&
+                                selectedCellIndex != null)
+                            ? () {
+                                setState(() {
+                                  puzzle
+                                      .board()
+                                      ?.matrix()?[selectedBlockIndex!]
+                                          [selectedCellIndex!]
+                                      .setValue(number);
+                                  // Désélectionner la case après l'insertion
+                                  selectedBlockIndex = null;
+                                  selectedCellIndex = null;
+                                });
+                              }
+                            : null,
+                        style: ButtonStyle(
+                            backgroundColor: WidgetStateProperty.all<Color>(
+                                const Color.fromARGB(255, 28, 84, 167))),
+                        child: Text(
+                          number.toString(),
+                          style: const TextStyle(
+                              fontSize: 20, color: Colors.white),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ],
             ),
           ],
         ),
