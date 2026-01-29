@@ -60,6 +60,11 @@ class _GameState extends State<Game> {
         selectedBlockIndex = null;
         selectedCellIndex = null;
       });
+
+      // Vérifier si le jeu est terminé
+      if (isGameComplete()) {
+        gameEnd();
+      }
     } else {
       // Valeur incorrecte : afficher le SnackBar et ne pas insérer
       final snackBar = SnackBar(
@@ -76,6 +81,29 @@ class _GameState extends State<Game> {
 
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
+  }
+
+  // Vérifie si le jeu est terminé
+  bool isGameComplete() {
+    var board = puzzle.board()?.matrix();
+    if (board == null) return false;
+
+    for (int i = 0; i < 9; i++) {
+      for (int j = 0; j < 9; j++) {
+        var value = board[i][j].getValue();
+        if (value == null || value == 0) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  void gameEnd() {
+    // Naviguer vers l'écran de fin
+    Future.delayed(const Duration(milliseconds: 500), () {
+      Navigator.pushNamed(context, '/end');
+    });
   }
 
   @override
@@ -207,6 +235,20 @@ class _GameState extends State<Game> {
                   }),
                 ),
               ],
+            ),
+            // ----------------------- BOUTON RESOLUTION DE GRILLE -----------------------
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                 gameEnd();
+              },
+              style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.all<Color>(
+                      const Color.fromARGB(255, 201, 121, 17))),
+              child: const Text(
+                'Résoudre le Sudoku',
+                style: TextStyle(fontSize: 20, color: Colors.white),
+              ),
             ),
           ],
         ),
